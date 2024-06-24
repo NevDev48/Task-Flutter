@@ -18,10 +18,11 @@ class AddTaskResponseModel {
   String toRawJson() => json.encode(toJson());
 
   factory AddTaskResponseModel.fromJson(Map<String, dynamic> json) => AddTaskResponseModel(
-    status: json["status"],
-    message: json["message"],
-    tittle: json["tittle"],
-    description: json["description"],  );
+    status: json["status"] ?? 0,
+    message: json["message"] ?? '',
+    tittle: json["tittle"] ?? '',
+    description: json["description"] ?? '',
+  );
 
   Map<String, dynamic> toJson() => {
     "status": status,

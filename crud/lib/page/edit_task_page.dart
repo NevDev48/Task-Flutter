@@ -1,10 +1,12 @@
+import 'package:crud/data/datasources/task_remote_datasource.dart';
 import 'package:crud/data/models/add_task_request_model.dart';
 import 'package:crud/data/models/task_response_model.dart';
-import 'package:crud/data/datasources/task_remote_datasource.dart';
+import 'package:crud/data/models/update_task_request_model.dart';
 import 'package:flutter/material.dart';
 
 class EditTaskPage extends StatefulWidget {
   final Task task;
+
   const EditTaskPage({
     Key? key,
     required this.task,
@@ -15,14 +17,14 @@ class EditTaskPage extends StatefulWidget {
 }
 
 class _EditTaskPageState extends State<EditTaskPage> {
-  final tittleController = TextEditingController();
-  final descriptionController = TextEditingController();
+  final TextEditingController tittleController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    tittleController.text = widget.task.tittle ?? '';
-    descriptionController.text = widget.task.description ?? '';
+    tittleController.text = widget.task.tittle;
+    descriptionController.text = widget.task.description;
   }
 
   @override
@@ -38,7 +40,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
         children: [
           TextField(
             decoration: const InputDecoration(
-              hintText: 'Tittle',
+              hintText: 'Title',
               border: OutlineInputBorder(),
             ),
             controller: tittleController,
@@ -54,25 +56,20 @@ class _EditTaskPageState extends State<EditTaskPage> {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () async {
-              final newModel = AddTaskRequestModel(
+              final model = UpdateTaskRequestModel(
+                id: int.parse(widget.task.id),
                 tittle: tittleController.text,
-                description: descriptionController.text,
+                description: descriptionController.text, 
               );
-
-              if (widget.task.id != null && newModel.tittle != null && newModel.description != null) {
-                try {
-                  await TaskRemoteDatasource().updateTask(widget.task.id!, newModel);
-                  Navigator.pop(context, true); // Kembali ke halaman sebelumnya dengan indikator sukses
-                } catch (e) {
-                  // Tangani error
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Failed to update task: $e')),
-                  );
-                }
-              } else {
-                // Tampilkan pesan error jika ada nilai null
+              try {
+                print('Model: ${model.toJson()}'); // Tambahkan log untuk debugging
+                final response = await TaskRemoteDatasource().updateTask(model);
+                // print(response.message); // Tambahkan log untuk debugging
+                Navigator.pop(context, true); // Kembali dengan indikator sukses
+              } catch (e) {
+                print('Error: $e'); // Tangani kesalahan dengan menampilkan pesan
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: const Text('All fields are required.')),
+                  SnackBar(content: Text('Failed to add task: $e')),
                 );
               }
             },
